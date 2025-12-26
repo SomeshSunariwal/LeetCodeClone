@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* GUTTERS */
+.gutter {
+    position: relative;
+    z-index: 50;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.gutter:hover::after {
+    background-color: #3b82f6;
+}
+
+.gutter::after {
+    content: '';
+    position: absolute;
+    background-color: transparent;
+    transition: background-color 0.2s;
+    border-radius: 999px;
+}
+
+.gutter-horizontal {
+    cursor: col-resize;
+    width: 10px;
+    margin: 0 -1px;
+}
+
+.gutter-horizontal::after {
+    width: 4px;
+    height: 24px;
+}
+
+.gutter-vertical {
+    cursor: row-resize;
+    height: 10px;
+    margin: -1px 0;
+}
+
+.gutter-vertical::after {
+    height: 4px;
+    width: 24px;
+}
+
+/* MARKDOWN */
+.markdown-body {
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.monaco-editor,
+.monaco-editor-background,
+.monaco-editor .margin {
+    background-color: transparent !important;
+}
