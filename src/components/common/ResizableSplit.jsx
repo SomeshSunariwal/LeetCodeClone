@@ -93,26 +93,43 @@ export default function ResizableSplit({
             className={`flex h-full w-full ${direction === "horizontal" ? "flex-row" : "flex-col"
                 }`}
         >
-            {React.Children.map(children, (child, index) => (
-                <>
-                    <div
-                        style={{ flexBasis: `${sizes[index]}%` }}
-                        className="h-full overflow-hidden flex-shrink-0"
-                    >
-                        {child}
-                    </div>
+            {React.Children.map(children, (child, index) => {
+                const lastIndex = React.Children.count(children) - 1;
+                const isLast = index === lastIndex;
 
-                    {index < React.Children.count(children) - 1 && (
+                let paddingClass = "";
+
+                if (isLast) {
+                    if (direction === "horizontal") {
+                        paddingClass = "pr-4";   // right gap ONLY on last column
+                    } else {
+                        paddingClass = "pb-2";   // bottom gap ONLY on last row
+                    }
+                }
+
+                return (
+                    <React.Fragment key={index}>
                         <div
-                            className={`gutter ${direction === "horizontal"
-                                ? "gutter-horizontal"
-                                : "gutter-vertical"
-                                }`}
-                            onMouseDown={(e) => startResize(index, e)}
-                        />
-                    )}
-                </>
-            ))}
+                            style={{ flexBasis: `${sizes[index]}%` }}
+                            className={`h-full overflow-hidden flex-shrink-0 ${paddingClass}`}
+                        >
+                            {isLast}
+                            {child}
+                        </div>
+
+                        {index < lastIndex && (
+                            <div
+                                className={`gutter ${direction === "horizontal"
+                                    ? "gutter-horizontal"
+                                    : "gutter-vertical"
+                                    }`}
+                                onMouseDown={(e) => startResize(index, e)}
+                            />
+                        )}
+                    </React.Fragment>
+                );
+            })}
+
         </div>
     );
 }

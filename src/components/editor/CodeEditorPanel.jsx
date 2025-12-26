@@ -33,7 +33,7 @@ export default function CodeEditorPanel({ theme }) {
             {/* EDITOR */}
             <PanelCard >
                 {/* Toolbar */}
-                <div className="h-12 border-b mr-5 border-light-border dark:border-dark-border flex items-center px-3 justify-between bg-gray-50/50 dark:bg-[#1e1e1e]">
+                <div className="h-12 border-b border-light-border dark:border-dark-border flex items-center px-3 justify-between bg-gray-50/50 dark:bg-[#1e1e1e]">
                     <div className="flex items-center gap-3">
                         {/* Language */}
                         <select
