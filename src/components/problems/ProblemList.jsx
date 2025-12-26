@@ -24,17 +24,16 @@ export default function ProblemList({ problems, onSelect, selectedId }) {
                     <input
                         type="text"
                         placeholder="Search..."
-                        className="
-      w-full
-      pl-11 pr-4 py-2.5
-      bg-white
-      rounded-lg
-      text-sm text-gray-800
-      placeholder-gray-400
-      border border-blue-500
-      focus:outline-none
-      focus:ring-2 focus:ring-blue-200
-    "
+                        className="w-full
+                                    pl-11 pr-4 py-2.5
+                                    bg-white
+                                    rounded-lg
+                                    text-sm text-gray-800
+                                    placeholder-gray-400
+                                    border border-blue-500
+                                    focus:outline-none
+                                    focus:ring-2 focus:ring-blue-200
+                                    "
                     />
                 </div>
 

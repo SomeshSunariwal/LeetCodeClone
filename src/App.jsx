@@ -18,7 +18,7 @@ export default function App() {
   }, [theme]);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-light-bg dark:bg-dark-bg p-2 gap-2">
+    <div className="h-screen w-screen flex flex-col bg-light-bg dark:bg-dark-bg p-3 gap-2">
 
       {/* ✅ HEADER */}
       <Header

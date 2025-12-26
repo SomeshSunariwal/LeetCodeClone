@@ -31,33 +31,34 @@ export default function CodeEditorPanel({ theme }) {
         <ResizableSplit direction="vertical" initialSizes={[70, 30]}>
 
             {/* EDITOR */}
-            <PanelCard>
+            <PanelCard >
                 {/* Toolbar */}
-                <div className="h-12 border-b border-light-border dark:border-dark-border flex items-center px-3 justify-between bg-gray-50/50 dark:bg-[#1e1e1e]">                    <div className="flex items-center gap-3">
-                    {/* Language */}
-                    <select
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                        className="text-xs font-semibold px-3 py-1 rounded-lg bg-white dark:bg-dark-bg border"
-                    >
-                        <option value="javascript">JavaScript</option>
-                        <option value="python">Python</option>
-                        <option value="java">Java</option>
-                        <option value="cpp">C++</option>
-                    </select>
+                <div className="h-12 border-b mr-5 border-light-border dark:border-dark-border flex items-center px-3 justify-between bg-gray-50/50 dark:bg-[#1e1e1e]">
+                    <div className="flex items-center gap-3">
+                        {/* Language */}
+                        <select
+                            value={language}
+                            onChange={(e) => setLanguage(e.target.value)}
+                            className="text-xs font-semibold px-3 py-1 rounded-lg bg-white dark:bg-dark-bg border"
+                        >
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                        </select>
 
-                    {/* Font Size */}
-                    <div className="flex items-center gap-1">
-                        <i className="fas fa-font text-xs text-gray-400"></i>
-                        <input
-                            type="range"
-                            min="12"
-                            max="24"
-                            value={fontSize}
-                            onChange={(e) => setFontSize(+e.target.value)}
-                        />
+                        {/* Font Size */}
+                        <div className="flex items-center gap-1">
+                            <i className="fas fa-font text-xs text-gray-400"></i>
+                            <input
+                                type="range"
+                                min="12"
+                                max="24"
+                                value={fontSize}
+                                onChange={(e) => setFontSize(+e.target.value)}
+                            />
+                        </div>
                     </div>
-                </div>
 
                     <div className="flex items-center gap-2">
                         <IconButton
@@ -86,63 +87,100 @@ export default function CodeEditorPanel({ theme }) {
 
             {/* CONSOLE / TEST CASES */}
             <PanelCard>
-                {/* Tabs */}
-                <div className="flex border-b bg-gray-50 dark:bg-[#1e1e1e]">
-                    {["case", "console"].map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 text-xs font-bold uppercase ${activeTab === tab
-                                ? "text-blue-600 border-b-2 border-blue-500"
-                                : "text-gray-500"
-                                }`}
-                        >
-                            {tab === "case" ? "Test Cases" : "Console"}
-                        </button>
-                    ))}
+
+                {/* TABS */}
+                <div className="shrink-0 flex items-center gap-6 px-4 h-12 border-b bg-gray-50 dark:bg-[#1e1e1e]">
+                    <button
+                        onClick={() => setActiveTab("case")}
+                        className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide pb-2 ${activeTab === "case"
+                            ? "text-blue-600 border-b-2 border-blue-500"
+                            : "text-gray-500"
+                            }`}
+                    >
+                        <i className="fas fa-vial text-xs"></i>
+                        Test Cases
+                    </button>
+
+                    <button
+                        onClick={() => setActiveTab("console")}
+                        className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wide pb-2 ${activeTab === "console"
+                            ? "text-blue-600 border-b-2 border-blue-500"
+                            : "text-gray-500"
+                            }`}
+                    >
+                        <i className="fas fa-terminal text-xs"></i>
+                        Console
+                    </button>
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 p-4 overflow-y-auto">
+                {/* SCROLL AREA */}
+                <div className="flex-1 overflow-y-auto px-4 py-4 pr-3">
+
                     {activeTab === "case" ? (
                         <>
-                            {/* Case Buttons */}
-                            <div className="flex gap-2 mb-4">
+                            {/* CASE SELECTOR */}
+                            <div className="flex items-center gap-2 mb-5">
                                 {testCases.map((tc, idx) => (
                                     <button
                                         key={tc.id}
                                         onClick={() => setActiveCase(idx)}
-                                        className={`px-3 py-1 rounded text-xs ${activeCase === idx
+                                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold ${activeCase === idx
                                             ? "bg-blue-500 text-white"
-                                            : "bg-gray-200 dark:bg-gray-700"
+                                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
                                             }`}
                                     >
                                         Case {idx + 1}
                                     </button>
                                 ))}
+
                                 <button
                                     onClick={addTestCase}
-                                    className="px-3 py-1 border border-dashed rounded text-xs"
+                                    className="w-8 h-8 flex items-center justify-center
+                       rounded-lg border border-dashed
+                       text-gray-500 hover:text-blue-600
+                       hover:border-blue-400"
                                 >
                                     +
                                 </button>
                             </div>
 
-                            {/* Input */}
-                            <textarea
-                                value={testCases[activeCase].input}
-                                onChange={(e) => updateCase("input", e.target.value)}
-                                className="w-full h-20 p-2 mb-3 font-mono text-sm rounded border"
-                                placeholder="Input"
-                            />
+                            {/* INPUT */}
+                            <div className="mb-4">
+                                <div className="text-[10px] font-bold tracking-widest text-gray-400 mb-1">
+                                    INPUT
+                                </div>
+                                <textarea
+                                    value={testCases[activeCase].input}
+                                    onChange={(e) => updateCase("input", e.target.value)}
+                                    className="
+                                                w-full h-24
+                                                px-3 py-2
+                                                font-mono text-sm
+                                                rounded-lg
+                                                bg-white dark:bg-dark-bg
+                                                border border-gray-200 dark:border-gray-700
+                                                focus:outline-none focus:border-blue-500"
+                                />
+                            </div>
 
-                            {/* Output */}
-                            <textarea
-                                value={testCases[activeCase].output}
-                                onChange={(e) => updateCase("output", e.target.value)}
-                                className="w-full h-16 p-2 font-mono text-sm rounded border"
-                                placeholder="Expected Output"
-                            />
+                            {/* OUTPUT */}
+                            <div>
+                                <div className="text-[10px] font-bold tracking-widest text-gray-400 mb-1">
+                                    EXPECTED OUTPUT
+                                </div>
+                                <textarea
+                                    value={testCases[activeCase].output}
+                                    onChange={(e) => updateCase("output", e.target.value)}
+                                    className="w-full h-20
+                                                px-3 py-2
+                                                font-mono text-sm
+                                                rounded-lg
+                                                bg-white dark:bg-dark-bg
+                                                border border-gray-200 dark:border-gray-700
+                                                focus:outline-none focus:border-blue-500
+                                                "
+                                />
+                            </div>
                         </>
                     ) : (
                         <div className="font-mono text-sm text-gray-500">
@@ -151,16 +189,34 @@ export default function CodeEditorPanel({ theme }) {
                     )}
                 </div>
 
-                {/* Actions */}
-                <div className="p-3 border-t flex justify-between bg-gray-50 dark:bg-[#1e1e1e]">
-                    <button className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-700">
-                        Run
+                {/* ACTIONS */}
+                <div className="shrink-0 h-14 px-4 border-t flex items-center justify-between bg-gray-50 dark:bg-[#1e1e1e]">
+                    <button className="
+                            px-5 py-2
+                            rounded-lg
+                            text-sm font-semibold
+                            bg-gray-200 dark:bg-gray-700
+                            text-gray-700 dark:text-gray-200
+                            ">
+                        Run Code
                     </button>
-                    <button className="px-6 py-2 rounded bg-green-600 text-white">
+
+                    <button className="
+                            px-8 py-2
+                            rounded-lg
+                            text-sm font-semibold
+                            bg-green-600 hover:bg-green-700
+                            text-white
+                            flex items-center gap-2
+                            ">
                         Submit
+                        <i className="fas fa-paper-plane text-xs"></i>
                     </button>
                 </div>
+
             </PanelCard>
+
+
         </ResizableSplit>
     );
 }
