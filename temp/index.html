@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode Clone</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#0f0f0f',         // Deeper black for background
+                            panel: '#1e1e1e',      // Panel background
+                            border: '#333333',     // Subtle border
+                            text: '#e5e5e5',       // Primary text
+                            textSec: '#a3a3a3',    // Secondary text
+                            accent: '#3b82f6'
+                        },
+                        light: {
+                            bg: '#f8fafc',         // Very light blue-grey
+                            panel: '#ffffff',
+                            border: '#e2e8f0',
+                            text: '#1e293b',
+                            textSec: '#64748b',
+                            accent: '#2563eb'
+                        }
+                    },
+                    boxShadow: {
+                        'premium': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'premium-dark': '0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Premium Gutter Styles */
+        .gutter {
+            position: relative;
+            z-index: 50;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .gutter:hover::after {
+            background-color: #3b82f6;
+        }
+
+        /* The visible handle line */
+        .gutter::after {
+            content: '';
+            position: absolute;
+            background-color: transparent;
+            transition: background-color 0.2s;
+            border-radius: 999px;
+        }
+
+        .gutter-horizontal {
+            cursor: col-resize;
+            width: 10px;
+            /* Wider hit area */
+            margin: 0 -1px;
+            /* Overlap slightly */
+        }
+
+        .gutter-horizontal::after {
+            width: 4px;
+            height: 24px;
+        }
+
+        .gutter-vertical {
+            cursor: row-resize;
+            height: 10px;
+            /* Wider hit area */
+            margin: -1px 0;
+        }
+
+        .gutter-vertical::after {
+            height: 4px;
+            width: 24px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #404040;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #525252;
+        }
+
+        /* Markdown Enhancements */
+        .markdown-body {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .markdown-body h1 {
+            font-size: 1.75em;
+            font-weight: 700;
+            margin-bottom: 0.75em;
+            letter-spacing: -0.02em;
+        }
+
+        .markdown-body h2 {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 0.75em;
+            margin-top: 1.5em;
+            letter-spacing: -0.01em;
+        }
+
+        .markdown-body p {
+            margin-bottom: 1.25em;
+            color: inherit;
+        }
+
+        .markdown-body code {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: 'Menlo', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        .dark .markdown-body code {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .markdown-body pre {
+            background-color: #f1f5f9;
+            padding: 16px;
+            border-radius: 12px;
+            overflow: auto;
+            margin-bottom: 1.5em;
+            border: 1px solid #e2e8f0;
+        }
+
+        .dark .markdown-body pre {
+            background-color: #111;
+            border-color: #333;
+        }
+    </style>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Marked -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+</head>
+
+<body
+    class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors duration-200 h-screen w-screen flex flex-col overflow-hidden">
+    <div id="root" class="h-full w-full flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useMemo } = React;
+
+        // --- Mock Data ---
+        const DUMMY_PROBLEMS = Array.from({ length: 25 }, (_, i) => ({
+            id: i + 1,
+            title: `Problem ${i + 1}: ${['Two Sum', 'Add Two Numbers', 'Longest Substring', 'Median of Two Arrays', 'Longest Palindromic Substring'][i % 5]} ${Math.floor(i / 5) + 1}`,
+            difficulty: ['Easy', 'Medium', 'Hard'][i % 3],
+            category: ['Array', 'String', 'DP', 'Tree', 'Graph'][i % 5],
+            description: `
+# Problem ${i + 1} Description
+
+Given an array of integers \`nums\` and an integer \`target\`, return indices of the two numbers such that they add up to \`target\`.
+
+You may assume that each input would have **exactly one solution**, and you may not use the same element twice.
+
+## Example 1:
+
+\`\`\`
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+\`\`\`
+
+## Constraints:
+
+- \`2 <= nums.length <= 10^4\`
+- \`-10^9 <= nums[i] <= 10^9\`
+- \`-10^9 <= target <= 10^9\`
+            `
+        }));
+
+        // --- Common UI Components ---
+        const PanelCard = ({ children, className = "" }) => (
+            <div className={`h-full w-full bg-light-panel dark:bg-dark-panel border border-light-border dark:border-dark-border rounded-xl shadow-premium dark:shadow-premium-dark overflow-hidden flex flex-col transition-colors duration-200 ${className}`}>
+                {children}
+            </div>
+        );
+
+        const IconButton = ({ icon, onClick, active, title, className = "" }) => (
+            <button
+                onClick={onClick}
+                title={title}
+                className={`p-1.5 rounded-lg transition-all duration-200 ${active
+                    ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'
+                    : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200'
+                    } ${className}`}
+            >
+                <i className={icon}></i>
+            </button>
+        );
+
+        // --- Resizable Split Component ---
+        const ResizableSplit = ({ direction = 'horizontal', children, initialSizes = [30, 70] }) => {
+            const containerRef = useRef(null);
+            const [sizes, setSizes] = useState(initialSizes);
+
+            const startResize = (index, e) => {
+                e.preventDefault();
+                const container = containerRef.current;
+                const startPos = direction === 'horizontal' ? e.clientX : e.clientY;
+                const containerSize = direction === 'horizontal' ? container.offsetWidth : container.offsetHeight;
+                const startSizes = [...sizes];
+
+                const onMouseMove = (moveEvent) => {
+                    const currentPos = direction === 'horizontal' ? moveEvent.clientX : moveEvent.clientY;
+                    const deltaPixels = currentPos - startPos;
+                    const deltaPercentage = (deltaPixels / containerSize) * 100;
+
+                    const newSizes = [...startSizes];
+                    const combinedSize = startSizes[index] + startSizes[index + 1];
+
+                    // Min size 5% or 50px approx
+                    let newSizeIndex = startSizes[index] + deltaPercentage;
+                    newSizeIndex = Math.max(10, Math.min(combinedSize - 10, newSizeIndex));
+
+                    newSizes[index] = newSizeIndex;
+                    newSizes[index + 1] = combinedSize - newSizeIndex;
+
+                    setSizes(newSizes);
+                };
+
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            };
+
+            return (
+                <div ref={containerRef} className={`flex ${direction === 'horizontal' ? 'flex-row' : 'flex-col'} w-full h-full`}>
+                    {React.Children.map(children, (child, index) => {
+                        if (!child) return null;
+                        return (
+                            <>
+                                <div style={{
+                                    flexBasis: `${sizes[index]}%`,
+                                    flexGrow: 0,
+                                    flexShrink: 0,
+                                    overflow: 'hidden',
+                                    position: 'relative'
+                                }} className="h-full w-full">
+                                    {child}
+                                </div>
+                                {index < children.length - 1 && (
+                                    <div
+                                        className={`gutter ${direction === 'horizontal' ? 'gutter-horizontal' : 'gutter-vertical'}`}
+                                        onMouseDown={(e) => startResize(index, e)}
+                                    >
+                                        <div className={`bg-gray-300 dark:bg-gray-600 rounded-full transition-colors ${direction === 'horizontal' ? 'w-[4px] h-8' : 'h-[4px] w-8'}`}></div>
+                                    </div>
+                                )}
+                            </>
+                        );
+                    })}
+                </div>
+            );
+        };
+
+        // --- Monaco Editor Wrapper ---
+        const MonacoEditor = ({ language, theme, fontSize, value, onChange, wordWrap }) => {
+            const editorRef = useRef(null);
+            const containerRef = useRef(null);
+
+            useEffect(() => {
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' } });
+
+                require(['vs/editor/editor.main'], function () {
+                    if (!containerRef.current) return;
+                    if (editorRef.current) editorRef.current.dispose();
+
+                    editorRef.current = monaco.editor.create(containerRef.current, {
+                        value: value || '// Start coding here...',
+                        language: language || 'javascript',
+                        theme: theme === 'dark' ? 'vs-dark' : 'vs',
+                        fontSize: fontSize || 14,
+                        automaticLayout: true,
+                        minimap: { enabled: false },
+                        wordWrap: wordWrap ? 'on' : 'off',
+                        scrollBeyondLastLine: false,
+                        padding: { top: 16, bottom: 16 },
+                        fontFamily: "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+                        fontLigatures: true,
+                        lineHeight: 24,
+                    });
+
+                    editorRef.current.onDidChangeModelContent(() => {
+                        if (onChange) onChange(editorRef.current.getValue());
+                    });
+                });
+
+                return () => { if (editorRef.current) editorRef.current.dispose(); }
+            }, []);
+
+            useEffect(() => {
+                if (editorRef.current) {
+                    monaco.editor.setTheme(theme === 'dark' ? 'vs-dark' : 'vs');
+                    editorRef.current.updateOptions({ fontSize: fontSize, wordWrap: wordWrap ? 'on' : 'off' });
+                    const model = editorRef.current.getModel();
+                    if (model) monaco.editor.setModelLanguage(model, language);
+                }
+            }, [theme, fontSize, wordWrap, language]);
+
+            return <div ref={containerRef} className="w-full h-full" />;
+        };
+
+        // --- Problem List Component ---
+        const ProblemList = ({ problems, onSelect, selectedId, collapsed, setCollapsed }) => {
+            const [search, setSearch] = useState('');
+            const [filterDiff, setFilterDiff] = useState('All');
+            const [filterCat, setFilterCat] = useState('All');
+
+            const filteredProblems = problems.filter(p =>
+                p.title.toLowerCase().includes(search.toLowerCase()) &&
+                (filterDiff === 'All' || p.difficulty === filterDiff) &&
+                (filterCat === 'All' || p.category === filterCat)
+            );
+
+            if (collapsed) {
+                return (
+                    <PanelCard className="items-center py-6 gap-6">
+                        <button onClick={() => setCollapsed(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500">
+                            <i className="fas fa-angles-right"></i>
+                        </button>
+                        <div className="flex flex-col gap-6 text-xl text-gray-400">
+                            <i className="fas fa-list"></i>
+                            <i className="fas fa-search"></i>
+                        </div>
+                    </PanelCard>
+                )
+            }
+
+            return (
+                <PanelCard>
+                    <div className="p-4 border-b border-light-border dark:border-dark-border space-y-4">
+                        <div className="flex justify-between items-center">
+                            <h2 className="font-bold text-lg dark:text-white tracking-tight">Problems</h2>
+                            <IconButton icon="fas fa-angles-left" onClick={() => setCollapsed(true)} />
+                        </div>
+
+                        <div className="relative group">
+                            <i className="fas fa-search absolute left-3 top-3 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                className="w-full pl-9 pr-4 py-2 bg-gray-100 dark:bg-dark-bg border border-transparent focus:bg-white dark:focus:bg-[#111] focus:border-blue-500 rounded-lg text-sm outline-none transition-all dark:text-white shadow-sm"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
+                                <select
+                                    className="w-full appearance-none bg-gray-100 dark:bg-dark-bg text-xs font-medium py-1.5 px-3 rounded-lg dark:text-gray-300 border border-transparent hover:border-gray-300 dark:hover:border-gray-600 outline-none cursor-pointer"
+                                    value={filterDiff}
+                                    onChange={(e) => setFilterDiff(e.target.value)}
+                                >
+                                    <option value="All">Difficulty</option>
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                                <i className="fas fa-chevron-down absolute right-2 top-2 text-[10px] text-gray-400 pointer-events-none"></i>
+                            </div>
+                            <div className="relative flex-1">
+                                <select
+                                    className="w-full appearance-none bg-gray-100 dark:bg-dark-bg text-xs font-medium py-1.5 px-3 rounded-lg dark:text-gray-300 border border-transparent hover:border-gray-300 dark:hover:border-gray-600 outline-none cursor-pointer"
+                                    value={filterCat}
+                                    onChange={(e) => setFilterCat(e.target.value)}
+                                >
+                                    <option value="All">Category</option>
+                                    <option value="Array">Array</option>
+                                    <option value="String">String</option>
+                                    <option value="DP">DP</option>
+                                </select>
+                                <i className="fas fa-chevron-down absolute right-2 top-2 text-[10px] text-gray-400 pointer-events-none"></i>
+                            </div>
+                            <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs shadow-md transition-all transform active:scale-95">
+                                <i className="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+                        {filteredProblems.map(problem => (
+                            <div
+                                key={problem.id}
+                                onClick={() => onSelect(problem)}
+                                className={`group p-3 mb-1 rounded-lg cursor-pointer transition-all duration-200 border border-transparent ${selectedId === problem.id
+                                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm'
+                                    : 'hover:bg-gray-50 dark:hover:bg-[#2a2a2a]'
+                                    }`}
+                            >
+                                <div className="flex justify-between items-start mb-1.5">
+                                    <span className={`font-semibold text-sm truncate ${selectedId === problem.id ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white'}`}>
+                                        {problem.title}
+                                    </span>
+                                </div>
+                                <div className="flex gap-2 text-[10px] font-medium uppercase tracking-wider">
+                                    <span className={`px-2 py-0.5 rounded-md ${problem.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' :
+                                        problem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400' :
+                                            'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+                                        }`}>
+                                        {problem.difficulty}
+                                    </span>
+                                    <span className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md">
+                                        {problem.category}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </PanelCard>
+            );
+        };
+
+        // --- Description Component ---
+        const Description = ({ problem }) => {
+            const contentRef = useRef(null);
+
+            useEffect(() => {
+                if (contentRef.current && problem) {
+                    contentRef.current.innerHTML = marked.parse(problem.description);
+                }
+            }, [problem]);
+
+            if (!problem) return <div className="p-8 text-gray-400 text-center">Select a problem to view details</div>;
+
+            return (
+                <PanelCard>
+                    <div className="px-5 py-3 border-b border-light-border dark:border-dark-border bg-gray-50/50 dark:bg-[#1e1e1e] backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center">
+                        <h2 className="font-bold flex items-center gap-2 dark:text-white text-sm uppercase tracking-wide text-gray-600">
+                            <i className="fas fa-file-alt text-blue-500"></i> Description
+                        </h2>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                        <div ref={contentRef} className="markdown-body text-light-text dark:text-dark-text"></div>
+                    </div>
+                </PanelCard>
+            );
+        };
+
+        // --- Code Editor Panel ---
+        const CodeEditorPanel = ({ theme }) => {
+            const [code, setCode] = useState('// Write your code here...');
+            const [language, setLanguage] = useState('javascript');
+            const [fontSize, setFontSize] = useState(14);
+            const [wordWrap, setWordWrap] = useState(false);
+            const [activeTab, setActiveTab] = useState('case');
+            const [testCases, setTestCases] = useState([{ id: 1, input: 'nums = [2,7,11,15], target = 9', output: '[0,1]' }]);
+            const [activeTestCaseIndex, setActiveTestCaseIndex] = useState(0);
+
+            const updateTestCase = (field, value) => {
+                const newCases = [...testCases];
+                newCases[activeTestCaseIndex] = { ...newCases[activeTestCaseIndex], [field]: value };
+                setTestCases(newCases);
+            };
+
+            const addTestCase = () => {
+                const newId = testCases.length > 0 ? Math.max(...testCases.map(t => t.id)) + 1 : 1;
+                setTestCases([...testCases, { id: newId, input: '', output: '' }]);
+                setActiveTestCaseIndex(testCases.length);
+            };
+
+            return (
+                <ResizableSplit direction="vertical" initialSizes={[70, 30]}>
+
+                    {/* TOP PART: EDITOR CARD */}
+                    <div className="h-full pb-1 mr-5">
+                        <PanelCard>
+                            {/* Toolbar */}
+                            <div className="h-12 border-b border-light-border dark:border-dark-border flex items-center px-3 justify-between bg-gray-50/50 dark:bg-[#1e1e1e]">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <select
+                                            value={language}
+                                            onChange={(e) => setLanguage(e.target.value)}
+                                            className="appearance-none bg-white dark:bg-dark-bg border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1 pr-8 text-xs font-semibold outline-none dark:text-gray-200 hover:border-blue-400 transition-colors shadow-sm"
+                                        >
+                                            <option value="javascript">JavaScript</option>
+                                            <option value="python">Python</option>
+                                            <option value="java">Java</option>
+                                            <option value="cpp">C++</option>
+                                        </select>
+                                        <i className="fas fa-chevron-down absolute right-2.5 top-2 text-[10px] text-gray-400 pointer-events-none"></i>
+                                    </div>
+
+                                    <div className="h-4 w-[1px] bg-gray-300 dark:bg-gray-700 mx-1"></div>
+
+                                    <div className="flex items-center gap-1.5 text-xs dark:text-gray-400 font-medium">
+                                        <i className="fas fa-brain text-green-500"></i>
+                                        <span className="hidden xl:inline">IntelliSense</span>
+                                        <label className="relative inline-flex items-center cursor-pointer ml-1">
+                                            <input type="checkbox" className="sr-only peer" defaultChecked />
+                                            <div className="w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
+                                        </label>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 ml-2">
+                                        <span className="text-[10px] text-gray-400"><i className="fas fa-font"></i></span>
+                                        <input
+                                            type="range" min="12" max="24"
+                                            value={fontSize}
+                                            onChange={(e) => setFontSize(parseInt(e.target.value))}
+                                            className="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-blue-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <IconButton
+                                        icon="fas fa-wrap-text"
+                                        onClick={() => setWordWrap(!wordWrap)}
+                                        active={wordWrap}
+                                        title="Toggle Word Wrap"
+                                    />
+                                    <button className="text-xs font-medium px-2 py-1 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded hover:bg-gray-100 dark:hover:bg-gray-800">
+                                        <i className="fas fa-wand-magic-sparkles mr-1"></i> Prettier
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Editor */}
+                            <div className="flex-1 overflow-hidden relative">
+                                <MonacoEditor
+                                    language={language}
+                                    theme={theme}
+                                    fontSize={fontSize}
+                                    wordWrap={wordWrap}
+                                    value={code}
+                                    onChange={setCode}
+                                />
+                            </div>
+                        </PanelCard>
+                    </div>
+
+                    {/* BOTTOM PART: CONSOLE CARD */}
+                    <div className="h-full pt-1 mr-5 pb-2">
+                        <PanelCard>
+                            {/* Tab Headers */}
+                            <div className="flex items-center border-b border-light-border dark:border-dark-border bg-gray-50/50 dark:bg-[#1e1e1e] px-2">
+                                <button
+                                    className={`relative px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'case' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    onClick={() => setActiveTab('case')}
+                                >
+                                    <i className="fas fa-vial mr-2"></i> Test Cases
+                                    {activeTab === 'case' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-500 rounded-t-full"></div>}
+                                </button>
+                                <button
+                                    className={`relative px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'console' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                                    onClick={() => setActiveTab('console')}
+                                >
+                                    <i className="fas fa-terminal mr-2"></i> Console
+                                    {activeTab === 'console' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-blue-500 rounded-t-full"></div>}
+                                </button>
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-white dark:bg-dark-panel">
+                                {activeTab === 'case' ? (
+                                    <div className="space-y-4">
+                                        <div className="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar">
+                                            {testCases.map((tc, idx) => (
+                                                <button
+                                                    key={tc.id}
+                                                    onClick={() => setActiveTestCaseIndex(idx)}
+                                                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm border whitespace-nowrap ${activeTestCaseIndex === idx
+                                                        ? 'bg-blue-500 text-white border-blue-600 shadow-md'
+                                                        : 'bg-white dark:bg-dark-bg text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-blue-400'
+                                                        }`}
+                                                >
+                                                    Case {idx + 1}
+                                                </button>
+                                            ))}
+                                            <button
+                                                onClick={addTestCase}
+                                                className="px-3 py-1.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-xs text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 flex-shrink-0 transition-colors"
+                                            >
+                                                <i className="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+
+                                        <div className="space-y-4 animate-fadeIn">
+                                            <div className="group">
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Input</label>
+                                                <textarea
+                                                    value={testCases[activeTestCaseIndex].input}
+                                                    onChange={(e) => updateTestCase('input', e.target.value)}
+                                                    className="w-full h-20 bg-gray-50 dark:bg-[#111] p-3 rounded-lg font-mono text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none resize-none transition-all"
+                                                    placeholder="Enter input here..."
+                                                ></textarea>
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Expected Output</label>
+                                                <textarea
+                                                    value={testCases[activeTestCaseIndex].output}
+                                                    onChange={(e) => updateTestCase('output', e.target.value)}
+                                                    className="w-full h-16 bg-gray-50 dark:bg-[#111] p-3 rounded-lg font-mono text-sm text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none resize-none transition-all"
+                                                    placeholder="Enter expected output..."
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-full font-mono text-sm text-gray-600 dark:text-gray-400 p-2">
+                                        <div className="mb-2"> Console ready.</div>
+                                        <div className="text-gray-400 dark:text-gray-600 italic">// Run your code to see output</div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="p-3 border-t border-light-border dark:border-dark-border flex justify-between items-center bg-gray-50/50 dark:bg-[#1e1e1e]">
+                                <button className="px-5 py-2 rounded-lg text-sm font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition-all active:scale-95">
+                                    Run Code
+                                </button>
+                                <button className="px-8 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-500/20 transition-all active:scale-95 flex items-center gap-2">
+                                    Submit <i className="fas fa-paper-plane text-xs"></i>
+                                </button>
+                            </div>
+
+                        </PanelCard>
+                    </div>
+                </ResizableSplit>
+            );
+        };
+
+        // --- Main App ---
+        const App = () => {
+            const [theme, setTheme] = useState('light');
+            const [selectedProblem, setSelectedProblem] = useState(DUMMY_PROBLEMS[0]);
+            const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
+
+            useEffect(() => {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }, [theme]);
+
+            const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+
+            return (
+                <div className="flex flex-col h-screen w-screen bg-light-bg dark:bg-dark-bg p-2 gap-2">
+                    {/* Header */}
+                    <header className="h-14 bg-light-panel dark:bg-dark-panel border border-light-border dark:border-dark-border rounded-xl flex items-center justify-between px-4 shrink-0 shadow-premium dark:shadow-premium-dark z-20">
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-orange-500/20">L</div>
+                                <span className="font-bold text-lg tracking-tight hidden sm:block dark:text-white">LeetCode<span className="text-orange-500">Clone</span></span>
+                            </div>
+                            <nav className="hidden md:flex gap-1 bg-gray-100 dark:bg-[#111] p-1 rounded-lg">
+                                {['Explore', 'Problems', 'Contest', 'Discuss'].map((item, idx) => (
+                                    <a key={item} href="#" className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${idx === 1 ? 'bg-white dark:bg-dark-panel text-black dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'}`}>
+                                        {item}
+                                    </a>
+                                ))}
+                            </nav>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={toggleTheme}
+                                className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-yellow-400 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+                            >
+                                <i className={`fas ${theme === 'light' ? 'fa-moon' : 'fa-sun'}`}></i>
+                            </button>
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-lg shadow-blue-500/20 cursor-pointer">
+                                JD
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Content Area */}
+                    <div className="flex-1 overflow-hidden relative">
+                        <ResizableSplit
+                            key={leftPanelCollapsed ? 'collapsed' : 'expanded'}
+                            initialSizes={leftPanelCollapsed ? [5, 45, 50] : [20, 40, 40]}
+                            direction="horizontal"
+                        >
+                            <div className="h-full pr-1">
+                                <ProblemList
+                                    problems={DUMMY_PROBLEMS}
+                                    selectedId={selectedProblem.id}
+                                    onSelect={setSelectedProblem}
+                                    collapsed={leftPanelCollapsed}
+                                    setCollapsed={setLeftPanelCollapsed}
+                                />
+                            </div>
+
+                            <div className="h-full px-1">
+                                <Description problem={selectedProblem} />
+                            </div>
+
+                            <div className="h-full pl-1">
+                                <CodeEditorPanel theme={theme} />
+                            </div>
+
+                        </ResizableSplit>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
