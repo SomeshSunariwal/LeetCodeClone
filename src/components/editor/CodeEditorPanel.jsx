@@ -32,6 +32,10 @@ int main() {
 
 
     const codeResponse = useSelector((state) => state.codePrettier.data);
+    const { running, outputs } = useSelector(
+        (state) => state.runAllTestCases
+    );
+
 
     useEffect(() => {
         if (
@@ -112,18 +116,6 @@ int main() {
             mode: "local",
         }));
     }
-
-    const { running, outputs } = useSelector(
-        (state) => state.runAllTestCases
-    );
-
-    console.log("Running " + running);
-    console.log("output " + outputs);
-
-
-    // const outputs = useSelector(
-    //     (state) => state.runAllTestCases.outputs
-    // );
 
     useEffect(() => {
         if (!outputs.length) return;
