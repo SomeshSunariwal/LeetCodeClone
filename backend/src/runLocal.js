@@ -1,8 +1,8 @@
 // runLocal.js - compile and run simple programs locally (with Windows C++ fix)
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const { exec, spawn } = require('child_process');
+import fs from "fs";
+import os from "os";
+import path from "path";
+import { exec, spawn } from "child_process";
 
 function tmpFileName(prefix, ext) {
     const id = Date.now() + '-' + Math.floor(Math.random() * 100000);
@@ -54,7 +54,7 @@ function spawnRun(exePath, stdin = "") {
     });
 }
 
-async function runLocal(language, code, stdin = '') {
+export async function runLocal(language, code, stdin = '') {
     language = (language || '').toLowerCase();
 
     let srcPath, exePath, compileCmd, runCmd;
@@ -162,4 +162,4 @@ function escapeShellStdin(s) {
         .replace(/\n/g, '\\n');
 }
 
-module.exports = runLocal;
+

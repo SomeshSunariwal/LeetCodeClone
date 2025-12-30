@@ -11,45 +11,62 @@ export default function MonacoEditor({
 }) {
     const containerRef = useRef(null);
     const editorRef = useRef(null);
+    const modelRef = useRef(null);
 
+    // CREATE EDITOR (once)
     useEffect(() => {
+        modelRef.current = monaco.editor.createModel(
+            value || "// Write your code here...",
+            language
+        );
+
         editorRef.current = monaco.editor.create(containerRef.current, {
-            value: value || "// Write your code here...",
-            language: language || "javascript",
+            model: modelRef.current,
             theme: theme === "dark" ? "vs-dark" : "vs",
-
-            fontSize: fontSize || 14,
+            fontSize,
             lineHeight: 24,
-
-            padding: {
-                top: 16,
-                bottom: 16,
-            },
-
+            padding: { top: 16, bottom: 16 },
             minimap: { enabled: false },
             automaticLayout: true,
             scrollBeyondLastLine: false,
-
             wordWrap: wordWrap ? "on" : "off",
-
-            fontFamily:
-                "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
+            fontFamily: "'JetBrains Mono', Consolas, monospace",
             fontLigatures: true,
         });
-
 
         editorRef.current.onDidChangeModelContent(() => {
             onChange?.(editorRef.current.getValue());
         });
 
-        return () => editorRef.current?.dispose();
+        return () => {
+            modelRef.current?.dispose();
+            editorRef.current?.dispose();
+        };
     }, []);
 
+    // UPDATE THEME / OPTIONS
     useEffect(() => {
         if (!editorRef.current) return;
         monaco.editor.setTheme(theme === "dark" ? "vs-dark" : "vs");
-        editorRef.current.updateOptions({ fontSize, wordWrap: wordWrap ? "on" : "off" });
+        editorRef.current.updateOptions({
+            fontSize,
+            wordWrap: wordWrap ? "on" : "off",
+        });
     }, [theme, fontSize, wordWrap]);
+
+    // 🔥 UPDATE LANGUAGE PROPERLY
+    useEffect(() => {
+        if (!modelRef.current) return;
+        monaco.editor.setModelLanguage(modelRef.current, language);
+    }, [language]);
+
+    // UPDATE VALUE (external changes)
+    useEffect(() => {
+        if (!editorRef.current) return;
+        if (editorRef.current.getValue() !== value) {
+            editorRef.current.setValue(value || "");
+        }
+    }, [value]);
 
     return <div ref={containerRef} className="w-full h-full" />;
 }

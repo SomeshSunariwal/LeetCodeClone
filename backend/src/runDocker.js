@@ -7,10 +7,10 @@
 // 3. Then frontend Docker-mode will work automatically.
 // ---------------------------------------------------------------
 
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
-const { exec } = require("child_process");
+import fs from "fs";
+import os from "os";
+import path from "path";
+import { exec } from "child_process";
 
 function execCmd(cmd) {
     return new Promise((resolve) => {
@@ -20,7 +20,7 @@ function execCmd(cmd) {
     });
 }
 
-async function runDocker(language, code, stdin = "") {
+export async function runDocker(language, code, stdin = "") {
     // Check docker daemon
     const check = await execCmd("docker info");
     if (check.error) {
@@ -71,4 +71,4 @@ async function runDocker(language, code, stdin = "") {
     };
 }
 
-module.exports = runDocker;
+

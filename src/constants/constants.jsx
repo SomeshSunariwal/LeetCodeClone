@@ -7,6 +7,7 @@ const CONSTANTS = {
     PROBLEM: "problem",
     SLASH: "/",
     SAMPLE_CODE: "SampleCode",
+    CodePrettier: "prettify-code",
 };
 
 export default CONSTANTS;

@@ -32,6 +32,6 @@ function* fetchRunCode(action) {
     }
 }
 
-export default function* problemListWatcher() {
+export default function* runCodeWatcherWatcher() {
     yield takeLatest(fetchRunCodeStart.type, fetchRunCode);
 }
