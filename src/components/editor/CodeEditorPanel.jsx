@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import PanelCard from "../common/PanelCard";
 import MonacoEditor from "./MonacoEditor";
 import ResizableSplit from "../common/ResizableSplit";
-import * as monaco from "monaco-editor";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCodePrettierStart } from "../../data_store/code_prettier";
 import { runAllTestCasesStart } from "../../data_store/run_all_testcase_store";
@@ -64,9 +63,6 @@ int main() {
         java: "java",
         javascript: "javascript",
     };
-
-    monaco.languages.register({ id: "cpp" });
-
 
     ////////////////////////////////////
     /////////// HANDLERS ///////////
