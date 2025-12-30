@@ -1,14 +1,41 @@
 import PanelCard from "../common/PanelCard";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProblemListStart } from "../../data_store/problemList_store";
 
-export default function ProblemList({ problems, onSelect, selectedId }) {
+export default function ProblemList() {
+
+    const [problemList, setProblemList] = useState(null);
+    const [selectedId, setSelectedId] = useState("");
+    const problemListFromStore = useSelector(state => state.problemList.data);
+
+
+    /////////////////////////////////////////////
+    ///////// Run at the time of page load ///////
+    //////////////////////////////////////////////
 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(fetchProblemListStart());
     }, []);
+
+
+    /////////////////////////////////////////////
+    ///////// When problemListFromStore get updated ///////
+    //////////////////////////////////////////////
+    useEffect(() => {
+        setProblemList(problemListFromStore);
+    }, [problemListFromStore]);
+
+    const SelectProblem = (problem, category, difficulty) => {
+        setSelectedId(problem.id + "-" + category + "-" + difficulty);
+    }
+
+    const getKey = (id, category, difficulty) => {
+        return id + "-" + category + "-" + difficulty;
+    }
+
+    console.log(selectedId);
 
     return (
         <PanelCard>
@@ -79,60 +106,72 @@ export default function ProblemList({ problems, onSelect, selectedId }) {
             </div>
 
             <div className="overflow-y-auto p-2">
-                {problems.map(problem => (
-                    <div
-                        key={problem.id}
-                        onClick={() => onSelect(problem)}
-                        className={`
-      group p-3 mb-1 rounded-lg cursor-pointer
-      transition-all duration-200
-      border border-transparent
-      ${selectedId === problem.id
-                                ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm"
-                                : "hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
-                            }
-    `}
-                    >
-                        {/* TITLE */}
-                        <div className="flex justify-between items-start mb-1.5">
-                            <span
+                {problemList !== null ? problemList.map(problem => {
+                    const { difficulty, categories } = problem;
+                    return categories !== null ? categories.map(cat => {
+                        const { problems, category } = cat;
+                        return problems !== null ? problems.map(catItem => (
+                            < div
+                                key={catItem.id}
+                                onClick={() => SelectProblem(catItem, category, difficulty)}
                                 className={`
-          font-semibold text-sm truncate
-          ${selectedId === problem.id
-                                        ? "text-blue-700 dark:text-blue-400"
-                                        : "text-gray-800 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white"
+                                group p-3 mb-1 rounded-lg cursor-pointer
+                                transition-all duration-200
+                                border border-transparent
+                                ${selectedId === getKey(catItem.id, category, difficulty)
+                                        ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm"
+                                        : "hover:bg-gray-50 dark:hover:bg-[#2a2a2a]"
                                     }
-        `}
+                               `}
                             >
-                                {problem.title}
-                            </span>
-                        </div>
+                                {/* TITLE */}
+                                <div className="flex justify-between items-start mb-1.5">
+                                    <span
+                                        className={`
+                                            font-semibold text-sm truncate
+                                            ${selectedId === getKey(catItem.id, category, difficulty)
+                                                ? "text-blue-700 dark:text-blue-400"
+                                                : "text-gray-800 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white"
+                                            }
+                                            `}
+                                    >
+                                        {catItem.name}
+                                    </span>
+                                </div>
 
-                        {/* TAGS */}
-                        <div className="flex gap-2 text-[10px] font-medium uppercase tracking-wider">
-                            {/* Difficulty */}
-                            <span
-                                className={`
-          px-2 py-0.5 rounded-md
-          ${problem.difficulty === "Easy"
-                                        ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
-                                        : problem.difficulty === "Medium"
-                                            ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400"
-                                            : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
-                                    }
-        `}
-                            >
-                                {problem.difficulty}
-                            </span>
+                                {/* TAGS */}
+                                <div className="flex gap-2 text-[10px] font-medium uppercase tracking-wider">
+                                    {/* Difficulty */}
+                                    <span
+                                        className={`
+                                        px-2 py-0.5 rounded-md
+                                        ${difficulty === "Easy"
+                                                ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                                                : difficulty === "Medium"
+                                                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400"
+                                                    : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
+                                            }`}
+                                    >
+                                        {difficulty}
+                                    </span>
 
-                            {/* Category */}
-                            <span className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md">
-                                {problem.category}
-                            </span>
-                        </div>
-                    </div>
-                ))}
+                                    {/* Category */}
+                                    <span className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md">
+                                        {category}
+                                    </span>
+                                </div>
+                            </div>
+                        )) : <div>Loading 1...</div>;
+                    }) : <div>Loading 2...</div>;
+                }) : <div>Loading 3...</div>}
             </div>
-        </PanelCard>
+        </PanelCard >
     );
 }
+
+// console.log(difficulty)
+// console.log(category);
+// console.log(catItem.id);
+// console.log(catItem.name);
+// console.log(catItem.file);
+
