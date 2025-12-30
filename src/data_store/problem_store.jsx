@@ -5,10 +5,17 @@ const problemSlice = createSlice({
 
     initialState: {
         data: {
+            Serial: "",
+            Level: "",
+            Category: "",
             ProblemName: "",
-            Description: "",
-            Constraints: "",
-            SampleCode: "",
+            ProblemDescription: "",
+            SampleCode: {
+                cpp: "",
+                c: "",
+                python: "",
+                java: ""
+            },
             SampleInputs: [],
             SampleOutputs: [],
             TestCaseInputs: [],
@@ -22,37 +29,12 @@ const problemSlice = createSlice({
         fetchProblemStart: (state) => {
             state.loading = true;
             state.error = null;
-
-            // Optional: clear previous problem
-            state.data = {
-                ProblemName: "",
-                Description: "",
-                Constraints: "",
-                SampleCode: "",
-                SampleInputs: [],
-                SampleOutputs: [],
-                TestCaseInputs: [],
-                TestCaseOutputs: []
-            };
         },
 
         fetchProblemSuccess: (state, action) => {
-            const p = action.payload;
-
+            state.data = action.payload
             state.loading = false;
             state.error = null;
-
-            // Map backend fields → our UI fields
-            state.data = {
-                ProblemName: p["Problem Name"] || "",
-                Description: p["Description"] || "",
-                Constraints: p["Constraints"] || "",
-                SampleCode: p["SampleCode"] || "",
-                SampleInputs: p["Sample Input"] || [],
-                SampleOutputs: p["Sample Output"] || [],
-                TestCaseInputs: p["Test Case Input"] || [],
-                TestCaseOutputs: p["Test Case Output"] || []
-            };
         },
 
         fetchProblemFailure: (state, action) => {

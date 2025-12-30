@@ -12,7 +12,7 @@ function* fetchProblemSaga(action) {
 
     try {
         const endpoint = CONSTANTS.BASE_URLS + CONSTANTS.SLASH + CONSTANTS.PROBLEM;
-        console.log("Hitted Endpoint" + endpoint);
+        console.log("Hitted Endpoint -> " + endpoint);
 
         const response = yield call(() =>
             axios.get(endpoint, {

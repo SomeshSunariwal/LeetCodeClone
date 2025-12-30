@@ -17,7 +17,7 @@ function* fetchRunCode(action) {
                 ? CONSTANTS.BASE_URLS + CONSTANTS.SLASH + CONSTANTS.RUN + CONSTANTS.SLASH + CONSTANTS.DOCKER
                 : CONSTANTS.BASE_URLS + CONSTANTS.SLASH + CONSTANTS.RUN + CONSTANTS.SLASH + CONSTANTS.LOCAL;
 
-        console.log("Hitted Endpoint  -> " + endpoint);
+        console.log("Hitted Endpoint -> " + endpoint);
         const response = yield call(() =>
             axios.post(endpoint, {
                 language,

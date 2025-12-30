@@ -11,8 +11,8 @@ import {
 function* fetchProblemListSaga() {
     try {
         const endpoint = CONSTANTS.BASE_URLS + CONSTANTS.SLASH + CONSTANTS.PROBLEM_META_DATA;
-        console.log("Hitted Endpoint" + endpoint);
-        // const endpoint = "http://localhost:5000/problems-meta";
+        console.log("Hitted Endpoint : -> " + endpoint);
+
         const response = yield call(() =>
             axios.get(endpoint)
         );

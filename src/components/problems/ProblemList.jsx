@@ -1,7 +1,7 @@
 import PanelCard from "../common/PanelCard";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { fetchProblemListStart } from "../../saga/problemLists_saga";
+import { fetchProblemListStart } from "../../data_store/problemList_store";
 
 export default function ProblemList({ problems, onSelect, selectedId }) {
 

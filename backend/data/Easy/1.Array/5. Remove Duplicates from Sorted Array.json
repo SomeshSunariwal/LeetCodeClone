@@ -1,5 +1,7 @@
 {
     "Serial": 1,
+    "Level": "Easy",
+    "Category": "Array",
     "ProblemName": "Two Sum",
     "ProblemDescription": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`. You may assume that each input would have exactly one solution, and you may not use the same element twice. Return the answer in any order.",
     "SampleCode": {
@@ -8,7 +10,7 @@
         "python": "print('Hello World!')",
         "java": ""
     },
-    "Sample Input": [
+    "SampleInput": [
         {
             "input": "2 7 11 15 9"
         },
@@ -16,7 +18,7 @@
             "input": "2 7 11 15 9"
         }
     ],
-    "Sample Output": [
+    "SampleOutput": [
         {
             "output": "0 1"
         },
@@ -24,7 +26,7 @@
             "output": "0 1"
         }
     ],
-    "Test Case Input": [
+    "TestCaseInputs": [
         {
             "input": "2 7 11 15 9"
         },
@@ -44,7 +46,7 @@
             "input": "1 5 3 7 9 8"
         }
     ],
-    "Test Case Output": [
+    "TestCaseOutputs": [
         {
             "output": "0 1"
         },
