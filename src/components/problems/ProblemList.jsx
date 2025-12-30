@@ -1,6 +1,15 @@
 import PanelCard from "../common/PanelCard";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchProblemListStart } from "../../saga/problemLists_saga";
 
 export default function ProblemList({ problems, onSelect, selectedId }) {
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(fetchProblemListStart());
+    }, []);
+
     return (
         <PanelCard>
             <div className="p-4 border-b border-light-border dark:border-dark-border space-y-4">
