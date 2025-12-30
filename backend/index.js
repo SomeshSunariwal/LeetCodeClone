@@ -12,10 +12,13 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 import prettier from "prettier";
-
+import { fileURLToPath } from "url";
 
 import { runLocal } from "./src/runLocal.js";
-import { runDocker } from "./src/runDocker.js"; // Docker runner
+import { runDocker } from "./src/runDocker.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PanelCard from "../common/PanelCard";
 import MonacoEditor from "./MonacoEditor";
 import ResizableSplit from "../common/ResizableSplit";
@@ -10,8 +10,7 @@ import { fetchCodePrettierStart } from "../../data_store/code_prettier";
 export default function CodeEditorPanel({ theme }) {
     const dispatch = useDispatch();
 
-    const [code, setCode] = useState(`
-# Write your code here
+    const [code, setCode] = useState(`///Write your code here
 #include <iostream>
 using namespace std;
 int main() {
@@ -24,10 +23,21 @@ return 0;
     const [intellisense, setIntellisense] = useState(false);
     const [wordWrap, setWordWrap] = useState(false);
     const [activeTab, setActiveTab] = useState("case");
+    const [prettifyRequested, setPrettifyRequested] = useState(false);
 
-    const codeResponse = useSelector((state) => state.codePrettier);
-    console.log(codeResponse);
 
+    const codeResponse = useSelector((state) => state.codePrettier.data);
+
+    useEffect(() => {
+        if (
+            prettifyRequested &&
+            codeResponse &&
+            codeResponse.formattedCode
+        ) {
+            setCode(codeResponse.formattedCode);
+            setPrettifyRequested(false); // reset after update
+        }
+    }, [codeResponse, prettifyRequested]);
 
 
     ///// Test Cases State /////
@@ -47,23 +57,45 @@ return 0;
 
     monaco.languages.register({ id: "cpp" });
 
-    const updateCase = (field, value) => {
-        const copy = [...testCases];
-        copy[activeCase][field] = value;
-        setTestCases(copy);
-    };
+
+    ////////////////////////////////////
+    /////////// HANDLERS ///////////
+    const makeCodePrettier = () => {
+        // For simplicity, we'll just format JS code using Monaco's built-in formatter
+        setPrettifyRequested(true);
+        dispatch(fetchCodePrettierStart({
+            language: languageMap[language], code: code
+        }))
+    }
+
 
     const addTestCase = () => {
         setTestCases([...testCases, { id: Date.now(), input: "", output: "" }]);
         setActiveCase(testCases.length);
     };
 
-    const makeCodePrettier = () => {
-        // For simplicity, we'll just format JS code using Monaco's built-in formatter
-        dispatch(fetchCodePrettierStart({
-            language: languageMap[language], code: code
-        }))
-    }
+    const updateCase = (field, value) => {
+        const copy = [...testCases];
+        copy[activeCase][field] = value;
+        setTestCases(copy);
+    };
+
+    const deleteTestCase = (idx) => {
+        if (testCases.length === 1) return; // 🚫 at least 1 case
+
+        setTestCases((prev) => {
+            const updated = prev.filter((_, i) => i !== idx);
+
+            // adjust active case safely
+            if (activeCase >= updated.length) {
+                setActiveCase(updated.length - 1);
+            } else if (idx < activeCase) {
+                setActiveCase(activeCase - 1);
+            }
+
+            return updated;
+        });
+    };
 
 
     return (
@@ -251,26 +283,49 @@ return 0;
                     {activeTab === "case" ? (
                         <>
                             {/* CASE SELECTOR */}
-                            <div className="flex items-center gap-2 mb-5">
+                            <div className="flex items-center gap-2 mb-5 flex-wrap">
                                 {testCases.map((tc, idx) => (
-                                    <button
-                                        key={tc.id}
-                                        onClick={() => setActiveCase(idx)}
-                                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold ${activeCase === idx
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-                                            }`}
-                                    >
-                                        Case {idx + 1}
-                                    </button>
+                                    <div key={tc.id} className="relative">
+                                        <button
+                                            onClick={() => setActiveCase(idx)}
+                                            className={`px-4 py-1.5 pr-6 rounded-lg text-xs font-semibold transition
+                    ${activeCase === idx
+                                                    ? "bg-blue-500 text-white"
+                                                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
+                                                }`}
+                                        >
+                                            Case {idx + 1}
+                                        </button>
+
+                                        {/* ❌ Delete */}
+                                        {testCases.length > 1 && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // ⛔ prevent case switch
+                                                    deleteTestCase(idx);
+                                                }}
+                                                className="absolute -top-1 -right-1
+                               w-4 h-4
+                               rounded-full
+                               bg-gray-400 hover:bg-red-500
+                               text-white text-[10px]
+                               flex items-center justify-center
+                               transition"
+                                                title="Delete case"
+                                            >
+                                                ✕
+                                            </button>
+                                        )}
+                                    </div>
                                 ))}
 
+                                {/* ➕ Add case */}
                                 <button
                                     onClick={addTestCase}
                                     className="w-8 h-8 flex items-center justify-center
-                       rounded-lg border border-dashed
-                       text-gray-500 hover:text-blue-600
-                       hover:border-blue-400"
+                   rounded-lg border border-dashed
+                   text-gray-500 hover:text-blue-600
+                   hover:border-blue-400"
                                 >
                                     +
                                 </button>
