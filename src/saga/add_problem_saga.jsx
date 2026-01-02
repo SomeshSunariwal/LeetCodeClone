@@ -8,13 +8,14 @@ import {
 import CONSTANTS from "../constants/constants";
 
 function* fetchAddProblemSaga(action) {
-    const data = action.payload;
+    const { form } = action.payload;
 
     try {
         const endpoint = CONSTANTS.BASE_URLS + CONSTANTS.API + CONSTANTS.SLASH + CONSTANTS.ADD_PROBLEM;
+        console.log(endpoint);
 
         const response = yield call(() =>
-            axios.post(endpoint, data)
+            axios.post(endpoint, { ...form })
         );
 
         yield put(fetchAddProblemSuccess(response.data));

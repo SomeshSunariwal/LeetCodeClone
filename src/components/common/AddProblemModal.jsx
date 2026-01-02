@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import MonacoEditor from "../editor/MonacoEditor";
+import { fetchAddProblemStart } from "../../data_store/add_problem_reducer";
+import { useDispatch } from "react-redux";
 
 export default function AddProblemModal({
     isOpen,
@@ -9,8 +11,11 @@ export default function AddProblemModal({
     levels = [],
     categories = []
 }) {
+    const dispatch = useDispatch();
+
     const [previewMode, setPreviewMode] = useState(false);
     const [language, setLanguage] = useState("cpp");
+
 
     /* ================= SINGLE SOURCE OF TRUTH ================= */
 
@@ -86,7 +91,11 @@ export default function AddProblemModal({
     };
 
     const submitForm = () => {
-        console.log("FINAL FORM DATA 👉", form);
+        console.log(form);
+
+        dispatch(fetchAddProblemStart({
+            form: form
+        }));
     }
 
     return (
