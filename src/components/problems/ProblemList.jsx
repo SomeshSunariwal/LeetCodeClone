@@ -1,8 +1,8 @@
 import PanelCard from "../common/PanelCard";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProblemListStart } from "../../data_store/problemList_store";
-import { fetchProblemStart } from "../../data_store/problem_store";
+import { fetchProblemListStart } from "../../data_store/problemList_reducer";
+import { fetchProblemStart } from "../../data_store/problem_reducer";
 import AddProblemModal from "../common/AddProblemModal";
 
 

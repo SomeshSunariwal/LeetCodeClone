@@ -4,13 +4,13 @@ import {
     fetchRunCodeStart,
     fetchRunCodeSuccess,
     fetchRunCodeFailure,
-} from "../data_store/run_code_store";
+} from "../data_store/run_code_reducer";
 
 import {
     runAllTestCaseUpdate,
     runAllTestCasesStart,
     runAllTestCasesEnd
-} from "../data_store/run_all_testcase_store";
+} from "../data_store/run_all_testcase_reducer";
 
 function* runAllTestCasesSaga(action) {
     const { testCases, language, code, mode } = action.payload;

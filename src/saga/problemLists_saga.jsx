@@ -6,7 +6,7 @@ import {
     fetchProblemListStart,
     fetchProblemListSuccess,
     fetchProblemListFailure
-} from "../data_store/problemList_store";
+} from "../data_store/problemList_reducer";
 
 function* fetchProblemListSaga() {
     try {

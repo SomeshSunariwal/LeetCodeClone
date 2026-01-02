@@ -4,7 +4,7 @@ import {
     fetchProblemStart,
     fetchProblemSuccess,
     fetchProblemFailure
-} from "../data_store/problem_store";
+} from "../data_store/problem_reducer";
 import CONSTANTS from "../constants/constants";
 
 function* fetchProblemSaga(action) {

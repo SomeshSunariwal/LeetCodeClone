@@ -4,6 +4,7 @@ import problemWatcher from "../saga/problem_saga";
 import runCodeWatcher from "../saga/runCode_saga"
 import codePrettierWatcher from "../saga/code_prettier_saga"
 import runAllTestCasesWatcher from "../saga/run_all_testcase_saga"
+import addProblemWatcher from "../saga/add_problem_saga"
 
 export default function* rootSaga() {
     yield all([
@@ -12,5 +13,6 @@ export default function* rootSaga() {
         runCodeWatcher(),
         codePrettierWatcher(),
         runAllTestCasesWatcher(),
+        addProblemWatcher()
     ]);
 }

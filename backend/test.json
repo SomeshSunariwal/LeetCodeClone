@@ -1,0 +1,33 @@
+{
+    "Serial": 1767357026995,
+    "Level": "Easy",
+    "Category": "1.Array",
+    "ProblemName": "New_Probelm 2",
+    "ProblemDescription": "",
+    "SampleCode": {
+        "cpp": "// Write your C++ code here\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // your code here\n    return 0;\n}",
+        "python": "# Write your Python code here\n\ndef main():\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    main()",
+        "java": "// Write your Java code here\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // your code here\n    }\n}",
+        "javascript": "// Write your JavaScript code here\n\nfunction main() {\n    // your code here\n}\n\nmain();"
+    },
+    "SampleInput": [
+        {
+            "input": "0"
+        }
+    ],
+    "SampleOutput": [
+        {
+            "output": "0"
+        }
+    ],
+    "TestCaseInputs": [
+        {
+            "input": "0"
+        }
+    ],
+    "TestCaseOutputs": [
+        {
+            "output": "0"
+        }
+    ]
+}

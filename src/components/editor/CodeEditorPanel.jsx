@@ -3,8 +3,8 @@ import PanelCard from "../common/PanelCard";
 import MonacoEditor from "./MonacoEditor";
 import ResizableSplit from "../common/ResizableSplit";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCodePrettierStart } from "../../data_store/code_prettier";
-import { runAllTestCasesStart } from "../../data_store/run_all_testcase_store";
+import { fetchCodePrettierStart } from "../../data_store/code_prettier_reducer";
+import { runAllTestCasesStart } from "../../data_store/run_all_testcase_reducer";
 
 
 export default function CodeEditorPanel({ theme }) {

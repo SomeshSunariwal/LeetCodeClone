@@ -4,14 +4,14 @@ import {
     fetchCodePrettierStart,
     fetchCodePrettierSuccess,
     fetchCodePrettierFailure
-} from "../data_store/code_prettier";
+} from "../data_store/code_prettier_reducer";
 import CONSTANTS from "../constants/constants";
 
 function* fetchCodePrettierSaga(action) {
     const { language, code } = action.payload;
 
     try {
-        const endpoint = CONSTANTS.BASE_URLS + CONSTANTS.API + CONSTANTS.SLASH + CONSTANTS.CodePrettier;
+        const endpoint = CONSTANTS.BASE_URLS + CONSTANTS.API + CONSTANTS.SLASH + CONSTANTS.CODE_PRETTIER;
 
         const response = yield call(() =>
             axios.post(endpoint, {

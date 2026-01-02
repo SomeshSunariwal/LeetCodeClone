@@ -136,6 +136,7 @@ app.get("/api/problem", (req, res) => {
     }
 });
 
+
 app.post("/api/prettify-code", async (req, res) => {
     logRequest(req);
 
@@ -224,6 +225,89 @@ app.post("/api/prettify-code", async (req, res) => {
         });
     }
 });
+
+
+app.post("/api/add-problem", async (req, res) => {
+    logRequest(req)
+    try {
+        const data = req.body;
+
+        const {
+            Level,
+            Category,
+            ProblemName
+        } = data;
+
+        if (!Level || !Category || !ProblemName) {
+            return res.status(400).json({
+                error: "Level, Category and ProblemName are required"
+            });
+        }
+
+        // Base directory (you can rename "data" if you want)
+        const BASE_DIR = path.join(process.cwd(), "data");
+
+        // Target directory: /data/Level/Category
+        const targetDir = path.join(BASE_DIR, Level, Category);
+
+        // Ensure directory exists
+        if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+        }
+
+        // Read existing files to determine next serial
+        const files = fs.readdirSync(targetDir);
+
+        const serials = files
+            .map(file => {
+                const match = file.match(/^(\d+)\./);
+                return match ? parseInt(match[1], 10) : null;
+            })
+            .filter(Boolean);
+
+        const nextSerial = serials.length > 0
+            ? Math.max(...serials) + 1
+            : 1;
+
+        // Sanitize problem name for filename
+        const safeProblemName = ProblemName
+            .replace(/[^a-zA-Z0-9-_ ]/g, "")
+            .trim()
+            .replace(/\s+/g, "_");
+
+        const fileName = `${nextSerial}. ${safeProblemName}.json`;
+        const filePath = path.join(targetDir, fileName);
+
+        console.log(fileName);
+
+
+        // Update serial in payload (overwrite incoming serial)
+        const finalPayload = {
+            ...data,
+            Serial: nextSerial
+        };
+
+        // Write JSON file
+        fs.writeFileSync(
+            filePath,
+            JSON.stringify(finalPayload, null, 4),
+            "utf-8"
+        );
+
+        return res.status(201).json({
+            message: "Problem added successfully",
+            serial: nextSerial,
+            path: `/data/${Level}/${Category}/${fileName}`
+        });
+
+    } catch (err) {
+        console.error("Add problem error:", err);
+        return res.status(500).json({
+            error: "Internal server error"
+        });
+    }
+});
+
 
 function logRequest(req) {
     console.log(`${req.url}`);

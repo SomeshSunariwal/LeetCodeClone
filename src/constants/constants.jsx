@@ -9,7 +9,8 @@ const CONSTANTS = {
     LOCAL: "local",
     PROBLEM: "problem",
     SAMPLE_CODE: "SampleCode",
-    CodePrettier: "prettify-code",
+    CODE_PRETTIER: "prettify-code",
+    ADD_PROBLEM: "add-problem",
 };
 
 export default CONSTANTS;

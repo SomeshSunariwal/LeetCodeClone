@@ -6,7 +6,7 @@ import {
     fetchRunCodeStart,
     fetchRunCodeSuccess,
     fetchRunCodeFailure
-} from "../data_store/run_code_store";
+} from "../data_store/run_code_reducer";
 
 function* fetchRunCode(action) {
     const { language, code, stdin, mode } = action.payload;

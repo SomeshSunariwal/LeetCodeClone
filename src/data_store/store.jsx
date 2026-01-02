@@ -1,10 +1,11 @@
 import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
-import problemReducer from "./problem_store";
-import problemListReducer from "./problemList_store";
-import runCodeStore from "./run_code_store";
-import codePrettierStore from "./code_prettier";
-import runAllTestCasesStore from "./run_all_testcase_store";
+import problemReducer from "./problem_reducer";
+import problemListReducer from "./problemList_reducer";
+import runCodeReducer from "./run_code_reducer";
+import codePrettierReducer from "./code_prettier_reducer";
+import runAllTestCasesReducer from "./run_all_testcase_reducer";
+import addProblemReducer from "./add_problem_reducer";
 
 import rootSaga from "./rootSaga";
 
@@ -14,9 +15,10 @@ export const store = configureStore({
     reducer: {
         problem: problemReducer,
         problemList: problemListReducer,
-        runCode: runCodeStore,
-        runAllTestCases: runAllTestCasesStore,
-        codePrettier: codePrettierStore
+        runCode: runCodeReducer,
+        runAllTestCases: runAllTestCasesReducer,
+        codePrettier: codePrettierReducer,
+        addProblem: addProblemReducer
     },
     middleware: (getDefault) => getDefault().concat(sagaMiddleware),
 });
