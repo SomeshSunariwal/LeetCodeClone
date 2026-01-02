@@ -136,6 +136,14 @@ export async function runLocal(language, code, stdin = '') {
             runCmd = `java -cp "${srcDir}" Main`;
         }
 
+        else if (language === 'javascript') {
+            srcPath = tmpFileName('prog', 'js');
+            fs.writeFileSync(srcPath, code);
+
+            // Node.js execution
+            runCmd = `node "${srcPath}"`;
+        }
+
         // Default execution (Linux/Mac) + non-CPP Windows
         const fullRunCmd = stdin
             ? `echo "${escapeShellStdin(stdin)}" | ${runCmd}`

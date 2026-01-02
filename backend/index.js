@@ -13,6 +13,8 @@ import fs from "fs";
 import path from "path";
 import prettier from "prettier";
 import { fileURLToPath } from "url";
+import { exec } from "child_process";
+import { v4 as uuid } from "uuid";
 
 import { runLocal } from "./src/runLocal.js";
 import { runDocker } from "./src/runDocker.js";
@@ -24,14 +26,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "5mb" }));
 
-const PRETTIER_PARSER_MAP = {
-    javascript: "babel",
-    typescript: "typescript",
-    json: "json",
-    html: "html",
-    css: "css",
-    markdown: "markdown",
-};
+
 
 // SIMPLE TEST
 app.get("/api", (req, res) => {
@@ -154,31 +149,74 @@ app.post("/api/prettify-code", async (req, res) => {
     }
 
     try {
-        const parser = PRETTIER_PARSER_MAP[language];
+        // ---------------- JAVASCRIPT ----------------
+        if (language === "javascript") {
+            const formattedCode = await prettier.format(code, {
+                parser: "babel",
+                semi: true,
+                singleQuote: false,
+                tabWidth: 4,
+                trailingComma: "es5",
+            });
 
-        // ❌ Language not supported by Prettier
-        if (!parser) {
+            return res.json({ success: true, language, formattedCode });
+        }
+
+        // Temp file handling
+        const tempId = uuid();
+        const tempDir = "/tmp";
+        let filePath, formatCmd;
+
+        // ---------------- PYTHON ----------------
+        if (language === "python") {
+            filePath = path.join(tempDir, `${tempId}.py`);
+            fs.writeFileSync(filePath, code);
+            formatCmd = `black ${filePath} --quiet`;
+        }
+
+        // ---------------- JAVA ----------------
+        else if (language === "java") {
+            filePath = path.join(tempDir, `${tempId}.java`);
+            fs.writeFileSync(filePath, code);
+            formatCmd = `google-java-format ${filePath}`;
+        }
+
+        // ---------------- C++ ----------------
+        else if (language === "cpp") {
+            filePath = path.join(tempDir, `${tempId}.cpp`);
+            fs.writeFileSync(filePath, code);
+            formatCmd = `clang-format -i ${filePath}`;
+        }
+
+        // ---------------- UNSUPPORTED ----------------
+        else {
             return res.json({
                 success: true,
                 language,
-                formattedCode: code, // return original
+                formattedCode: code,
                 note: "Formatting not supported for this language",
             });
         }
 
-        const formattedCode = await prettier.format(code, {
-            parser,
-            semi: true,
-            singleQuote: false,
-            tabWidth: 4,
-            trailingComma: "es5",
+        // Execute formatter
+        exec(formatCmd, (err) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    error: err.message,
+                });
+            }
+
+            const formattedCode = fs.readFileSync(filePath, "utf8");
+            fs.unlinkSync(filePath);
+
+            return res.json({
+                success: true,
+                language,
+                formattedCode,
+            });
         });
 
-        return res.json({
-            success: true,
-            language,
-            formattedCode,
-        });
     } catch (err) {
         return res.status(500).json({
             success: false,
