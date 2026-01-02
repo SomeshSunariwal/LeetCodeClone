@@ -21,3 +21,5 @@ If you are developing a production application, we recommend using TypeScript wi
 2. ./ -> `npm run dev`
 
 ### Create and Run Docker Step:
+1. docker system prune -f
+2. docker build -t dsa .
