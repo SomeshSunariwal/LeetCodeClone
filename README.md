@@ -1,6 +1,3 @@
-
----
-
 # Your own DSA practice app.
 
 ### 1.  Run Application on local
@@ -12,6 +9,6 @@
 ### 2. Create and Run Docker Step:
 ```
 1. docker system prune -f
-2. docker build -t dsa .
+2. docker build -t dsa .  (before this command -> First go to src\constants\constants.jsx and read)
 3. docker run -p 8080:8080 --name dsa_app dsa
 ```
